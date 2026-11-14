@@ -3,14 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'">
     <title>Cleaning checklist</title>
     <meta name="description" content="Cleaning checklist: answer the questions and follow only the applicable items.">
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../../lib/css/bootswatch.css">
     <link rel="stylesheet" href="../../lib/css/checklist.css">
     <link rel="alternate" type="text/plain" href="checklist.txt" title="Conditional checklist rules">
 </head>
 <body>
-    <a class="skip-link" href="#panel-questions">Skip to questions</a>
+    <a class="skip-link" href="#main">Skip to content</a>
     <header>
         <h1>Cleaning checklist</h1>
         <p id="safety-notice" role="note" data-testid="safety-notice">
@@ -19,7 +22,7 @@
             A phone alarm is only a reminder on your phone.
         </p>
     </header>
-    <main id="main">
+    <main id="main" tabindex="-1">
         <div id="status" role="status" aria-live="polite" data-testid="status"></div>
         <div class="tablist" role="tablist" aria-label="Checklist sections">
             <button type="button" role="tab" id="tab-questions" aria-controls="panel-questions" aria-selected="true" tabindex="0" data-testid="tab-questions">Questions</button>
@@ -38,7 +41,7 @@
         </div>
         <div id="panel-checklist" role="tabpanel" hidden aria-labelledby="tab-checklist" data-testid="panel-checklist">
             <h2>Checklist</h2>
-            <div id="tasks-root"><section class="task-group"><h3>Clean</h3><ul class="task-list"><li data-task-index="6"><input type="checkbox" id="task-6" data-testid="task-6" data-task-index="6" data-task-text="Put dirty clothes into washing machine"><label for="task-6"><span class="task-text">Put dirty clothes into washing machine</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li><li data-task-index="8"><input type="checkbox" id="task-8" data-testid="task-8" data-task-index="8" data-task-text="Take out recycling"><label for="task-8"><span class="task-text">Take out recycling</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li><li data-task-index="9"><input type="checkbox" id="task-9" data-testid="task-9" data-task-index="9" data-task-text="Put any trash from living room and kitchen into trash can"><label for="task-9"><span class="task-text">Put any trash from living room and kitchen into trash can</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li><li data-task-index="15"><input type="checkbox" id="task-15" data-testid="task-15" data-task-index="15" data-task-text="Organize bathroom vanity"><label for="task-15"><span class="task-text">Organize bathroom vanity</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li><li data-task-index="34"><input type="checkbox" id="task-34" data-testid="task-34" data-task-index="34" data-task-text="Wipe off living room table"><label for="task-34"><span class="task-text">Wipe off living room table</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li><li data-task-index="37"><input type="checkbox" id="task-37" data-testid="task-37" data-task-index="37" data-task-text="Sweep floor with red broom"><label for="task-37"><span class="task-text">Sweep floor with red broom</span><span class="task-role">Nick</span><span class="visually-hidden task-state"></span></label></li></ul></section></div>
+            <div id="tasks-root"><section class="task-group"><h3>Clean</h3><div class="task-list"><div class="task-row" data-task-index="6"><input type="checkbox" id="task-6" data-testid="task-6" data-task-index="6" data-task-text="Put dirty clothes into washing machine"><label for="task-6"><span class="task-text">Put dirty clothes into washing machine</span><span class="task-role">Nick</span></label></div><div class="task-row" data-task-index="8"><input type="checkbox" id="task-8" data-testid="task-8" data-task-index="8" data-task-text="Take out recycling"><label for="task-8"><span class="task-text">Take out recycling</span><span class="task-role">Nick</span></label></div><div class="task-row" data-task-index="9"><input type="checkbox" id="task-9" data-testid="task-9" data-task-index="9" data-task-text="Put any trash from living room and kitchen into trash can"><label for="task-9"><span class="task-text">Put any trash from living room and kitchen into trash can</span><span class="task-role">Nick</span></label></div><div class="task-row" data-task-index="15"><input type="checkbox" id="task-15" data-testid="task-15" data-task-index="15" data-task-text="Organize bathroom vanity"><label for="task-15"><span class="task-text">Organize bathroom vanity</span><span class="task-role">Nick</span></label></div><div class="task-row" data-task-index="34"><input type="checkbox" id="task-34" data-testid="task-34" data-task-index="34" data-task-text="Wipe off living room table"><label for="task-34"><span class="task-text">Wipe off living room table</span><span class="task-role">Nick</span></label></div><div class="task-row" data-task-index="37"><input type="checkbox" id="task-37" data-testid="task-37" data-task-index="37" data-task-text="Sweep floor with red broom"><label for="task-37"><span class="task-text">Sweep floor with red broom</span><span class="task-role">Nick</span></label></div></div></section></div>
         </div>
         <details id="applicable">
             <summary>

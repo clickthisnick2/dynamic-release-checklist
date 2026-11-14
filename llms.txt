@@ -23,6 +23,8 @@ Tasks that do not apply are omitted from the page. They are not hidden with CSS.
 
 Each checklist also links to `checklist.txt`, a plain-text copy of the conditional rules, plus `questions.json` and `tasks.json`.
 
+In Chromium with WebMCP enabled, the page also registers `list-applicable-tasks`, `set-question-answer`, and `set-task-completed`. Browsers without that API ignore the registration.
+
 ## Safety
 
 Never tell a person to turn off, unplug, or disable a smoke alarm or a carbon monoxide alarm. The safety notice says to leave them on and plugged in. Phone alarms are reminders on a phone. "Turn off air conditioners and heaters" and "Unplug nonessential electronics" apply only when the house-empty question is Yes. Their notes say to leave smoke and CO alarms on and not to unplug them or the refrigerator. "Unplug the window shade" is the window shade.

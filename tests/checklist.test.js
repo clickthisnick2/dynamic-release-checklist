@@ -73,8 +73,11 @@ test("answering the house question shows the heater item with the alarm warning"
     /Turn off air conditioners and heaters\. Leave smoke alarms and carbon monoxide alarms on and plugged in\./
   );
   assert.match(html, /<span class="task-text">Turn off air conditioners and heaters<\/span>/);
-  assert.match(html, /class="visually-hidden"> Leave smoke alarms and carbon monoxide alarms on and plugged in\./);
-  assert.match(html, /class="visually-hidden"> Do not unplug smoke alarms, carbon monoxide alarms, or the refrigerator\./);
+  assert.match(html, /aria-describedby="task-2-note"/);
+  assert.match(html, /id="task-2-note"/);
+  assert.match(html, /id="task-2-note">Leave smoke alarms and carbon monoxide alarms on and plugged in\./);
+  assert.match(html, /id="task-3-note">Do not unplug smoke alarms, carbon monoxide alarms, or the refrigerator\./);
+  assert.equal(html.includes("<ul"), false);
 });
 
 test("question ids are not array positions", () => {
@@ -176,4 +179,57 @@ test("summary counts hidden tasks", () => {
     app.summaryText(travelLike.tasks, answers),
     "2 of 4 tasks apply. 2 tasks are hidden because their conditions are not met."
   );
+});
+
+test("WebMCP tools validate input and skip registration without the API", () => {
+  const state = {
+    answers: app.defaultAnswers(travelLike.questions),
+    done: {},
+  };
+  const actions = {
+    questions() {
+      return travelLike.questions;
+    },
+    applicableItems() {
+      return app.applicableTasks(travelLike.tasks, state.answers);
+    },
+    listApplicable() {
+      return { count: app.applicableTasks(travelLike.tasks, state.answers).length };
+    },
+    applyAnswer(question, isYes) {
+      state.answers[question.id] = isYes;
+      return { questionId: question.id, answer: isYes ? "yes" : "no" };
+    },
+    applyCompleted(match, completed) {
+      state.done[match.index] = completed;
+      return { taskIndex: match.index, completed };
+    },
+  };
+  const tools = app.checklistToolDefinitions(actions);
+  assert.deepEqual(
+    tools.map((tool) => tool.name),
+    ["list-applicable-tasks", "set-question-answer", "set-task-completed"]
+  );
+  assert.equal(tools[0].annotations.readOnlyHint, true);
+  assert.equal(tools[1].annotations.readOnlyHint, false);
+  assert.equal(app.registerChecklistTools({}), false);
+  assert.equal(tools[0].execute({}, {}).count, 2);
+  assert.match(tools[1].execute({ questionId: 8, answer: "maybe" }, {}).error, /yes or no/);
+  assert.equal(tools[1].execute({ questionId: 8, answer: "yes" }, {}).answer, "yes");
+  assert.match(tools[2].execute({ taskIndex: 2, completed: "yes" }, {}).error, /true or false/);
+  assert.equal(tools[2].execute({ taskIndex: 2, completed: true }, {}).completed, true);
+  assert.match(tools[2].execute({ taskIndex: 99, completed: true }, {}).error, /not in the applicable list/);
+  const registered = [];
+  const fakeDoc = {
+    modelContext: {
+      registerTool(tool, options) {
+        registered.push({ name: tool.name, signal: options.signal });
+        return Promise.resolve();
+      },
+    },
+    defaultView: { addEventListener() {} },
+  };
+  assert.equal(app.registerChecklistTools(fakeDoc, actions), true);
+  assert.equal(registered.length, 3);
+  assert.equal(registered[0].signal.aborted, false);
 });

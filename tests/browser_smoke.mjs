@@ -197,8 +197,7 @@ async function main() {
       const label = heater ? document.querySelector("label[for='" + heater.id + "']") : null;
       heater.click();
       const visible = label ? label.querySelector(".task-text").innerText : "";
-      const stateEl = label ? label.querySelector(".task-state") : null;
-      const noteEl = label ? label.querySelector(".visually-hidden:not(.task-state)") : null;
+      const note = document.getElementById(heater.getAttribute("aria-describedby"));
       const hiddenBox = (el) => {
         if (!el) return false;
         const box = el.getBoundingClientRect();
@@ -207,9 +206,10 @@ async function main() {
       return {
         panelHidden: document.getElementById("panel-checklist").hidden,
         visible,
-        state: stateEl ? stateEl.textContent : "",
-        noteHidden: hiddenBox(noteEl),
-        stateHidden: hiddenBox(stateEl),
+        checked: heater.checked,
+        completedWord: label ? label.innerText.includes("Completed") : true,
+        noteHidden: hiddenBox(note),
+        noteText: note ? note.textContent : "",
         status: document.getElementById("status").textContent,
         url: location.search
       };
@@ -217,8 +217,8 @@ async function main() {
     assertCheck("checklist visible", !checked.panelHidden, "panel stayed hidden");
     assertCheck("heater label stays short", checked.visible === "Turn off air conditioners and heaters", checked.visible);
     assertCheck(
-      "completed text is hidden",
-      checked.state === "Completed." && checked.noteHidden && checked.stateHidden,
+      "completed state stays on the checkbox",
+      checked.checked && !checked.completedWord && checked.noteHidden && checked.noteText.includes("Leave smoke alarms"),
       JSON.stringify(checked)
     );
     assertCheck("complete status", checked.status.startsWith("Marked complete:"), checked.status);

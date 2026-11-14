@@ -1,3 +1,8 @@
+html {
+  color-scheme: dark;
+  scrollbar-color: #666 #111;
+}
+
 body {
   background: #111;
   color: #f5f5f5;
@@ -11,14 +16,19 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4,
+h5,
+h6 {
   color: #f7f7f7;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 1.2;
   margin: 0.6rem 0;
 }
 
 h1 {
   font-size: 1.8rem;
+  text-wrap: balance;
 }
 
 h2 {
@@ -148,10 +158,11 @@ button,
   padding: 0;
 }
 
-.task-list li {
+.task-row {
   align-items: flex-start;
   border-bottom: 1px solid #2a2a2a;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.55rem;
   margin: 0;
   padding: 0.4rem 0.15rem;
@@ -175,8 +186,14 @@ button,
   margin-left: 0.45rem;
 }
 
-.task-list li:has(input:checked) {
+.task-row:has(input:checked) {
   background: #145214;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 .visually-hidden {

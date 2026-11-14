@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'">
     <title>Dynamic Release Checklist</title>
     <meta name="description" content="Answer a few questions and keep only the checklist items that apply.">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="lib/css/bootswatch.css">
     <link rel="stylesheet" href="lib/css/checklist.css">
 </head>
@@ -16,7 +19,7 @@
             Do not turn them off or unplug them. A phone alarm is only a reminder on your phone.
         </p>
     </header>
-    <main>
+    <main id="main" tabindex="-1">
         <p>
             Answer the questions on a checklist. The page drops tasks that do not apply
             and lists the remaining items in plain language.
