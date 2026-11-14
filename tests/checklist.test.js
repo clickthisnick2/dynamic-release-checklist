@@ -182,9 +182,11 @@ test("summary counts hidden tasks", () => {
 });
 
 test("WebMCP tools validate input and skip registration without the API", () => {
+  const opened = [];
   const state = {
     answers: app.defaultAnswers(travelLike.questions),
     done: {},
+    confirmed: {},
   };
   const actions = {
     questions() {
@@ -196,8 +198,46 @@ test("WebMCP tools validate input and skip registration without the API", () => 
     listApplicable() {
       return { count: app.applicableTasks(travelLike.tasks, state.answers).length };
     },
+    isConfirmed(id) {
+      return state.confirmed[id] === true;
+    },
+    answerWord(id) {
+      return state.answers[id] === true ? "yes" : "no";
+    },
+    summary() {
+      return app.summaryText(travelLike.tasks, state.answers);
+    },
+    isDone(index) {
+      return state.done[index] === true;
+    },
+    applicableText() {
+      return app.formatApplicableText(
+        "Travel checklist",
+        travelLike.questions,
+        travelLike.tasks,
+        state.answers
+      );
+    },
+    showView(view) {
+      state.view = view;
+      return { view };
+    },
+    catalog() {
+      return [
+        {
+          slug: "travel-checklist",
+          title: "Travel checklist",
+          url: "examples/travel-checklist/checklist.html",
+        },
+      ];
+    },
+    openChecklist(url) {
+      opened.push(url);
+      return { url };
+    },
     applyAnswer(question, isYes) {
       state.answers[question.id] = isYes;
+      state.confirmed[question.id] = true;
       return { questionId: question.id, answer: isYes ? "yes" : "no" };
     },
     applyCompleted(match, completed) {
@@ -205,20 +245,53 @@ test("WebMCP tools validate input and skip registration without the API", () => 
       return { taskIndex: match.index, completed };
     },
   };
-  const tools = app.checklistToolDefinitions(actions);
-  assert.deepEqual(
-    tools.map((tool) => tool.name),
-    ["list-applicable-tasks", "set-question-answer", "set-task-completed"]
+  const tools = Object.fromEntries(
+    app.checklistToolDefinitions(actions).map((tool) => [tool.name, tool])
   );
-  assert.equal(tools[0].annotations.readOnlyHint, true);
-  assert.equal(tools[1].annotations.readOnlyHint, false);
+  assert.deepEqual(Object.keys(tools), [
+    "list-checklists",
+    "open-checklist",
+    "list-questions",
+    "get-next-question",
+    "set-question-answer",
+    "list-applicable-tasks",
+    "get-progress",
+    "set-task-completed",
+    "switch-view",
+    "copy-applicable-items",
+  ]);
+  assert.equal(tools["list-applicable-tasks"].annotations.readOnlyHint, true);
+  assert.equal(tools["get-progress"].annotations.readOnlyHint, true);
+  assert.equal(tools["set-question-answer"].annotations.readOnlyHint, false);
   assert.equal(app.registerChecklistTools({}), false);
-  assert.equal(tools[0].execute({}, {}).count, 2);
-  assert.match(tools[1].execute({ questionId: 8, answer: "maybe" }, {}).error, /yes or no/);
-  assert.equal(tools[1].execute({ questionId: 8, answer: "yes" }, {}).answer, "yes");
-  assert.match(tools[2].execute({ taskIndex: 2, completed: "yes" }, {}).error, /true or false/);
-  assert.equal(tools[2].execute({ taskIndex: 2, completed: true }, {}).completed, true);
-  assert.match(tools[2].execute({ taskIndex: 99, completed: true }, {}).error, /not in the applicable list/);
+  assert.equal(tools["list-applicable-tasks"].execute({}, {}).count, 2);
+  const first = tools["get-next-question"].execute({}, {});
+  assert.equal(first.question.id, 8);
+  assert.deepEqual(first.question.allowedAnswers, ["yes", "no"]);
+  assert.equal(first.remaining, 2);
+  assert.match(tools["set-question-answer"].execute({ questionId: 8, answer: "maybe" }, {}).error, /yes or no/);
+  assert.equal(tools["set-question-answer"].execute({ questionId: 8, answer: "yes" }, {}).answer, "yes");
+  assert.equal(tools["get-next-question"].execute({}, {}).question.id, 1);
+  assert.equal(tools["list-questions"].execute({}, {}).questions[0].answer, "yes");
+  const progress = tools["get-progress"].execute({}, {});
+  assert.equal(progress.completed, 0);
+  assert.equal(progress.remaining.some((item) => item.note.includes("Leave smoke alarms")), true);
+  assert.match(tools["set-task-completed"].execute({ taskIndex: 2, completed: "yes" }, {}).error, /true or false/);
+  assert.equal(tools["set-task-completed"].execute({ taskIndex: 2, completed: true }, {}).completed, true);
+  assert.equal(tools["get-progress"].execute({}, {}).completed, 1);
+  assert.match(
+    tools["set-task-completed"].execute({ taskIndex: 99, completed: true }, {}).error,
+    /not in the applicable list/
+  );
+  assert.equal(tools["switch-view"].execute({ view: "checklist" }, {}).view, "checklist");
+  assert.match(tools["switch-view"].execute({ view: "nope" }, {}).error, /questions, roles, or checklist/);
+  assert.match(tools["copy-applicable-items"].execute({}, {}).text, /Leave smoke alarms/);
+  assert.equal(tools["list-checklists"].execute({}, {}).checklists[0].slug, "travel-checklist");
+  assert.match(tools["open-checklist"].execute({ slug: "missing" }, {}).error, /No checklist/);
+  assert.equal(
+    tools["open-checklist"].execute({ slug: "travel-checklist" }, {}).url,
+    opened[0]
+  );
   const registered = [];
   const fakeDoc = {
     modelContext: {
@@ -230,6 +303,14 @@ test("WebMCP tools validate input and skip registration without the API", () => 
     defaultView: { addEventListener() {} },
   };
   assert.equal(app.registerChecklistTools(fakeDoc, actions), true);
-  assert.equal(registered.length, 3);
+  assert.equal(registered.length, 10);
+  const indexTools = app.checklistToolDefinitions({
+    catalog: actions.catalog,
+    openChecklist: actions.openChecklist,
+  });
+  assert.deepEqual(
+    indexTools.map((tool) => tool.name),
+    ["list-checklists", "open-checklist"]
+  );
   assert.equal(registered[0].signal.aborted, false);
 });
